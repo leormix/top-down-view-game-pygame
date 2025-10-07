@@ -151,8 +151,10 @@ class Enemy:
 
     def update(self, player):
 
-        self.pos.x = max(-55, min(self.pos.x, 800))
-        self.pos.y = max(-55, min(self.pos.y, 400))
+
+        self.target_pos.x = max(500, min(self.target_pos.x, 500 + 150 - 40))
+        self.target_pos.y = max(300, min(self.target_pos.y, 300 + 150 - 40))
+
 
 
         self.anim_count += 2
@@ -160,7 +162,7 @@ class Enemy:
         if self.walking:
             # двигаемся к цели
             vec = self.target_pos - self.pos
-            if vec.length() > self.speed:
+            if vec.length() > 1:
                 self.pos += vec.normalize() * self.speed
             else:
                 self.pos = self.target_pos
