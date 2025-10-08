@@ -4,6 +4,7 @@ from sprites import *
 import random
 from pytmx.util_pygame import load_pygame
 import pytmx
+import time
 
 pygame.init()
 
@@ -14,11 +15,17 @@ screen = pygame.display.set_mode ((WINDOW_WIDTH, WINDOW_HEIGHT))
 FPS = 60 
 ANIM_SPEED = 10
 running = True
+font = pygame.font.SysFont(None, 36)
+text_surface = font.render("Movement: W,SA,S,D Attack: SPACE Run: LSHIFT", True, (255, 255, 255))
 
+start_time = pygame.time.get_ticks()
+duration = 6000
+
+pygame.font.init()
 pygame.display.set_caption("test")
 
 class Player:
-    def __init__(self, x=300, y=300, speed=1.3, hp=3):
+    def __init__(self, x=300, y=300, speed=1.3):
         self.pos = Vector2(x, y)  # вектор шоб он не ганял нахуй
         self.anim_count = 0
         self.walking = False
@@ -29,7 +36,11 @@ class Player:
         self.attack_start_time = 0
         self.speed = speed
         self.knockback = Vector2(0, 0)   # вектор откидывания
-        self.knockback_decay = 0.85   
+        self.knockback_decay = 0.85 
+        self.hp = 3
+        self.dead = False
+        self.death_time = None
+
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
@@ -66,17 +77,16 @@ class Player:
         
         self.handle_input()
 
-        self.handle_input()
-
     # применяем отталкивание
         if self.knockback.length() > 0.1:
             self.pos += self.knockback
-            self.knockback *= self.knockback_decay  # плавное затухание
+            self.knockback *= self.knockback_decay
         else:
             self.knockback = Vector2(0, 0)
             
         self.anim_count += 2
         
+        # print("Losed") if self.hp == 0 else None
 
         # границы
         self.pos.x = max(-55, min(self.pos.x, 800))
@@ -117,6 +127,9 @@ class Player:
         frame = sprites[(self.anim_count // ANIM_SPEED) % len(sprites)]
         screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
 
+
+        
+
 player = Player()
 clock = pygame.time.Clock()
 
@@ -130,16 +143,18 @@ class Enemy:
         self.speed = speed
         self.tile_size = tile_size
         self.target_pos = self.pos.copy()  # куда идем
-        self.wait_time = 0  # время ожидания
+        self.wait_time = 0  
+        self.game_over_time = None
+
 
     def choose_new_action(self):
-        """Случайно выбираем: стоять или идти на один квадрат"""
+        # стоїм або ідем
         if random.random() < 0.5:
-            # стоим
+            # стоїм
             self.walking = False
             self.wait_time = random.randint(30, 60)  # 0.5–2 сек
         else:
-            # идем
+            # ідем
             self.walking = True
             dx, dy = random.choice([(2,0),(-2,0),(0,2),(0,-2)])
             self.target_pos = self.pos + Vector2(dx*self.tile_size, dy*self.tile_size)
@@ -160,7 +175,7 @@ class Enemy:
         self.anim_count += 2
 
         if self.walking:
-            # двигаемся к цели
+            # ідем
             vec = self.target_pos - self.pos
             if vec.length() > 1:
                 self.pos += vec.normalize() * self.speed
@@ -169,7 +184,7 @@ class Enemy:
                 self.walking = False
                 self.wait_time = random.randint(30, 120)
         else:
-            # стоим и ждем
+            # стоїм ждем
             self.wait_time -= 1
             if self.wait_time <= 0:
                 self.choose_new_action()
@@ -192,27 +207,42 @@ class Enemy:
         player_rect = pygame.Rect(player.pos.x, player.pos.y, 40, 40)
         enemy_rect = pygame.Rect(self.pos.x, self.pos.y, 40, 40)
         if player_rect.colliderect(enemy_rect):
-            if player.knockback.length() == 0:  # только если не откидывается уже
+            if player.knockback.length() == 0:
                 knockback = (player.pos - self.pos).normalize() * 8
                 player.knockback = knockback
+                player.hp -= 1
+                if player.hp <= 0 and not player.dead:
+                    player.dead = True
+                    player.death_time = pygame.time.get_ticks()
+                
 
 enemy = Enemy()
 
 
 while running:
-
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-       
 
     screen.fill((100, 100, 0))
 
     player.update()
     enemy.update(player)
+
+    # показываем подсказку первые 6 секунд
+    now = pygame.time.get_ticks()
+    if now - start_time < duration:
+        screen.blit(text_surface, (10, 10))
+
+    # показываем GAME OVER при смерти
+    if player.dead:
+        if pygame.time.get_ticks() - player.death_time < 3000:
+            lose_text = font.render("GAME OVER", True, (255, 255, 255))
+            text_rect = lose_text.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
+            screen.blit(lose_text, text_rect)
+
+    pygame.display.update()
     clock.tick(FPS)
 
-    pygame.display.update() 
 
 pygame.quit()
