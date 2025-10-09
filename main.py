@@ -165,7 +165,7 @@ player = Player()
 clock = pygame.time.Clock()
 
 class Enemy:
-    def __init__(self, x=500, y=300, speed=0.6, tile_size=32):
+    def __init__(self, x=500, y=300, speed=0.7, tile_size=32):
         self.pos = Vector2(x, y)
         self.anim_count = 0
         self.walking = False
@@ -287,17 +287,18 @@ while running:
 
     screen.fill((100, 100, 0))
 
-    current_time = pygame.time.get_ticks()
-    if current_time >= next_spawn_time:
-        x = random.randint(0, WINDOW_WIDTH - 40)
-        y = random.randint(0, WINDOW_HEIGHT - 40)
-        enemies.append(Enemy(x, y))
-        next_spawn_time = current_time + random.randint(5000, 10000)
-
+   
     player.update()
     ui.update(screen)
 
     if not player.dead:
+        current_time = pygame.time.get_ticks()
+        if current_time >= next_spawn_time:
+            x = random.randint(0, WINDOW_WIDTH - 40)
+            y = random.randint(0, WINDOW_HEIGHT - 40)
+            enemies.append(Enemy(x, y))
+            next_spawn_time = current_time + random.randint(5000, 10000)
+
         for enemy in enemies:
             enemy.update(player)
     else:
