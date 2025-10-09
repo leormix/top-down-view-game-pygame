@@ -266,3 +266,17 @@ goblinDeathRight = [
 goblinDeathRight = [pygame.transform.scale_by(frame, 2) for frame in goblinDeathRight]
 
 
+
+
+
+# UI
+heartSprites = [
+    pygame.image.load('sprites/UI/Heal_bar/image_part_001.png'),  # пустое
+    # pygame.image.load('sprites/UI/Heal_bar/image_part_002.png'),  # 1/4
+    # pygame.image.load('sprites/UI/Heal_bar/image_part_003.png'),  # 1/2
+    # pygame.image.load('sprites/UI/Heal_bar/image_part_004.png'),  # 3/4
+    pygame.image.load('sprites/UI/Heal_bar/image_part_005.png')   # полное
+]
+
+heartSprites = [pygame.transform.scale_by(frame, 2) for frame in heartSprites]
+

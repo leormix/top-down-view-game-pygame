@@ -16,13 +16,16 @@ FPS = 60
 ANIM_SPEED = 10
 running = True
 font = pygame.font.SysFont(None, 36)
-text_surface = font.render("Movement: W,SA,S,D Attack: SPACE Run: LSHIFT", True, (255, 255, 255))
 
 start_time = pygame.time.get_ticks()
-duration = 6000
+# duration = 6000
 
 pygame.font.init()
 pygame.display.set_caption("test")
+
+
+
+
 
 class Player:
     def __init__(self, x=300, y=300, speed=1.3):
@@ -35,22 +38,22 @@ class Player:
         self.last_horizontal = "right"
         self.attack_start_time = 0
         self.speed = speed
-        self.knockback = Vector2(0, 0)   # вектор откидывания
+        self.knockback = Vector2(0, 0)   # Откид
         self.knockback_decay = 0.85 
-        self.hp = 3
+        self.hp = 4
         self.dead = False
         self.death_time = None
         self.hurt = False
         self.hurt_time = None
-
-        
 
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
         vec = Vector2(0, 0)
 
-        if self.dead: return
+        if self.dead: 
+            pass
+            return
 
         # спринт
         self.running = keys[pygame.K_LSHIFT]
@@ -82,11 +85,11 @@ class Player:
 
 
     def update(self):
-        # обработка ввода и базовый инкремент анимации
+
         self.handle_input()
         self.anim_count += 2
 
-        # применяем отталкивание (перемещение + затухание)
+        # отталкування
 
         if self.knockback.length() > 0.1:
             self.pos += self.knockback
@@ -95,11 +98,11 @@ class Player:
         else:
             self.knockback = Vector2(0, 0)
 
-        # границы
-        self.pos.x = max(-55, min(self.pos.x, 800))
-        self.pos.y = max(-55, min(self.pos.y, 400))
+        # границі
+        self.pos.x = max(-55, min(self.pos.x, WINDOW_WIDTH - 100))
+        self.pos.y = max(-55, min(self.pos.y, WINDOW_HEIGHT - 100))
 
-        # если мёртв — показываем анимацию смерти и выходим
+        # смерть і боль
         if self.dead:
             sprites = humanDeathLeft if self.last_horizontal == "left" else humanDeathRight
             self.anim_count += 1  # счётчик кадров смерти
@@ -121,7 +124,7 @@ class Player:
             else:
                 self.hurt = False  
 
-        # обычная логика: атака / ходьба / стоим
+        # атака ходьба і просто стоять
         if self.attacking:
             if self.direction == "left":
                 sprites = humanAttackLeft
@@ -152,7 +155,7 @@ class Player:
         else:
             sprites = humanIdleLeft if self.last_horizontal == "left" else humanIdleRight
 
-        # отрисовка выбранного спрайта
+        # отрісовка
         if len(sprites) > 0:
             frame = sprites[(self.anim_count // ANIM_SPEED) % len(sprites)]
             screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
@@ -162,7 +165,7 @@ player = Player()
 clock = pygame.time.Clock()
 
 class Enemy:
-    def __init__(self, x=500, y=300, speed=1, tile_size=32):
+    def __init__(self, x=500, y=300, speed=0.6, tile_size=32):
         self.pos = Vector2(x, y)
         self.anim_count = 0
         self.walking = False
@@ -173,6 +176,7 @@ class Enemy:
         self.target_pos = self.pos.copy()  # куда идем
         self.wait_time = 0  
         self.game_over_time = None
+        self.hp = 3
 
 
     def choose_new_action(self):
@@ -192,69 +196,89 @@ class Enemy:
             if dy < 0: self.direction = "up"
             if dy > 0: self.direction = "down"
 
+
+        
     def update(self, player):
-
-
-        self.target_pos.x = max(500, min(self.target_pos.x, 500 + 150 - 40))
-        self.target_pos.y = max(300, min(self.target_pos.y, 300 + 150 - 40))
-
-
-
         self.anim_count += 2
 
-        if self.walking:
-            # ідем
-            vec = self.target_pos - self.pos
-            if vec.length() > 1:
-                self.pos += vec.normalize() * self.speed
+        # направление на игрока
+        direction = player.pos - self.pos
+        if direction.length() > 1:
+            move = direction.normalize() * self.speed
+            self.pos += move
+
+            # направление для анимации
+            if abs(direction.x) > abs(direction.y):
+                if direction.x < 0:
+                    self.direction, self.last_horizontal = "left", "left"
+                else:
+                    self.direction, self.last_horizontal = "right", "right"
             else:
-                self.pos = self.target_pos
-                self.walking = False
-                self.wait_time = random.randint(30, 120)
+                if direction.y < 0:
+                    self.direction = "up"
+                else:
+                    self.direction = "down"
+
+            walking = True
         else:
-            # стоїм ждем
-            self.wait_time -= 1
-            if self.wait_time <= 0:
-                self.choose_new_action()
+            walking = False
 
         # выбор спрайтов
-        if self.walking:
-            if self.direction == "left":
-                sprites = goblinWalkLeft
-            elif self.direction == "right":
-                sprites = goblinWalkRight
-            else:
-                sprites = goblinWalkLeft if self.last_horizontal == "left" else goblinWalkRight
+        if walking:
+            sprites = goblinWalkLeft if self.last_horizontal == "left" else goblinWalkRight
         else:
             sprites = goblinIdleLeft if self.last_horizontal == "left" else goblinIdleRight
 
         frame = sprites[(self.anim_count // ANIM_SPEED) % len(sprites)]
         screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
 
-        # столкновение с игроком
-        player_rect = pygame.Rect(player.pos.x, player.pos.y, 40, 40)
-        enemy_rect = pygame.Rect(self.pos.x, self.pos.y, 40, 40)
-        if player_rect.colliderect(enemy_rect):
-            if player.knockback.length() == 0:
-                knockback = (player.pos - self.pos).normalize() * 8
-                player.knockback = knockback
-                player.anim_count = 0
-                player.walking = False
-                player.hp -= 1
-                player.hurt = True
-                player.anim_count = 0
-
-                if player.hp <= 0 and not player.dead:
-                    player.walking = False
-                    player.dead = True
-                    player.death_time = pygame.time.get_ticks()
+        # столкновение с игроком (только если он жив)
+        if not player.dead:
+            player_rect = pygame.Rect(player.pos.x, player.pos.y, 40, 40)
+            enemy_rect = pygame.Rect(self.pos.x, self.pos.y, 40, 40)
+            if player_rect.colliderect(enemy_rect):
+                if player.knockback.length() == 0:
+                    knockback = (player.pos - self.pos).normalize() * 8
+                    player.knockback = knockback
+                    player.hp -= 1
                     player.anim_count = 0
+                    player.hurt = True
+                    player.walking = False
+
+                    if player.hp <= 0 and not player.dead:
+                        player.dead = True
+                        player.death_time = pygame.time.get_ticks()
+                        player.anim_count = 0
 
 
                 
+class UI:
+    def __init__(self, player):
+        self.player = player
+        self.movement_text = font.render("Movement: W,A,S,D  Attack: SPACE  Run: LSHIFT", True, (255, 255, 255))
+        self.now = pygame.time.get_ticks()
+
+    def update(self, surface):
+        surface.blit(self.movement_text, (20, 25))
+        for i in range(4):
+            if i < self.player.hp:
+                surface.blit(heartSprites[-1], (700 + i * 40, 20))
+            else:
+                surface.blit(heartSprites[0], (700 + i * 40, 20))
+
+        if player.dead:
+            if self.now - player.death_time < 60000:
+                lose_text = font.render("GAME OVER", True, (255, 255, 255))
+                text_rect = lose_text.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
+                screen.blit(lose_text, text_rect)
+   
+
+
+ui = UI(player)
 
 enemy = Enemy()
-
+enemies = []
+next_spawn_time = pygame.time.get_ticks() + random.randint(5000, 10000)
 
 while running:
     for event in pygame.event.get():
@@ -263,20 +287,27 @@ while running:
 
     screen.fill((100, 100, 0))
 
+    current_time = pygame.time.get_ticks()
+    if current_time >= next_spawn_time:
+        x = random.randint(0, WINDOW_WIDTH - 40)
+        y = random.randint(0, WINDOW_HEIGHT - 40)
+        enemies.append(Enemy(x, y))
+        next_spawn_time = current_time + random.randint(5000, 10000)
+
     player.update()
-    enemy.update(player)
+    ui.update(screen)
 
-    # показываем подсказку первые 6 секунд
-    now = pygame.time.get_ticks()
-    if now - start_time < duration:
-        screen.blit(text_surface, (10, 10))
+    if not player.dead:
+        for enemy in enemies:
+            enemy.update(player)
+    else:
+        # если игрок умер — просто отрисовываем врагов без движения
+        for enemy in enemies:
+            # выбираем статический спрайт (idle)
+            sprites = goblinIdleLeft if enemy.last_horizontal == "left" else goblinIdleRight
+            frame = sprites[(enemy.anim_count // ANIM_SPEED) % len(sprites)]
+            screen.blit(frame, (int(enemy.pos.x), int(enemy.pos.y)))
 
-    # показываем GAME OVER при смерти
-    if player.dead:
-        if pygame.time.get_ticks() - player.death_time < 60000:
-            lose_text = font.render("GAME OVER", True, (255, 255, 255))
-            text_rect = lose_text.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
-            screen.blit(lose_text, text_rect)
 
     pygame.display.update()
     clock.tick(FPS)
