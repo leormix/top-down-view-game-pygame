@@ -237,6 +237,32 @@ goblinWalkRight = [
 ]
 goblinWalkRight = [pygame.transform.scale_by(frame, 2) for frame in goblinWalkRight]
 
+# Гоблин получает пизды
+
+goblinHurtLeft = [
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_008.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_007.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_006.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_005.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_004.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_003.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_002.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_left/image_part_001.png'),
+]
+goblinHurtLeft = [pygame.transform.scale_by(frame, 2) for frame in goblinHurtLeft]
+
+goblinHurtRight = [
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_001.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_002.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_003.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_004.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_005.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_006.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_007.png'),
+    pygame.image.load('sprites/goblin/goblin_hurt_right/image_part_008.png'),
+]
+goblinHurtRight = [pygame.transform.scale_by(frame, 2) for frame in goblinHurtRight]
+
 # Враг умрает
 
 goblinDeathLeft = [

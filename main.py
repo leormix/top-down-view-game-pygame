@@ -25,8 +25,6 @@ pygame.display.set_caption("test")
 
 
 
-
-
 class Player:
     def __init__(self, x=300, y=300, speed=1.3):
         self.pos = Vector2(x, y)  # вектор шоб он не ганял нахуй
@@ -44,7 +42,6 @@ class Player:
         self.dead = False
         self.death_time = None
         self.hurt = False
-        self.hurt_time = None
 
 
     def handle_input(self):
@@ -94,7 +91,7 @@ class Player:
         if self.knockback.length() > 0.1:
             self.pos += self.knockback
             self.knockback *= self.knockback_decay
-            self.is_hurt = True
+            self.hurt = True
         else:
             self.knockback = Vector2(0, 0)
 
@@ -177,7 +174,11 @@ class Enemy:
         self.wait_time = 0  
         self.game_over_time = None
         self.hp = 3
-
+        self.hurt = False
+        self.hurt_time = 0
+        self.hurt_duration = 300
+        
+        
 
     def choose_new_action(self):
         # стоїм або ідем
@@ -200,6 +201,16 @@ class Enemy:
         
     def update(self, player):
         self.anim_count += 2
+        if self.hurt:
+            sprites = goblinHurtLeft if self.last_horizontal == "left" else goblinHurtRight
+            frame_index = (self.anim_count // ANIM_SPEED) % len(sprites)
+            frame = sprites[frame_index]
+            screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
+
+            # проверяем, прошло ли время анимации
+            if pygame.time.get_ticks() - self.hurt_time > self.hurt_duration:
+                self.hurt = False
+            return  # не двигаемся, пока "болит"
 
         # направление на игрока
         direction = player.pos - self.pos
@@ -249,6 +260,11 @@ class Enemy:
                         player.dead = True
                         player.death_time = pygame.time.get_ticks()
                         player.anim_count = 0
+
+        if self.hp <= 0:
+            enemies.remove(self)
+            return
+
 
 
                 
@@ -308,6 +324,22 @@ while running:
             sprites = goblinIdleLeft if enemy.last_horizontal == "left" else goblinIdleRight
             frame = sprites[(enemy.anim_count // ANIM_SPEED) % len(sprites)]
             screen.blit(frame, (int(enemy.pos.x), int(enemy.pos.y)))
+
+
+    if player.attacking:
+        for enemy in enemies:
+                if not enemy.hurt:
+                    distance = (enemy.pos - player.pos).length()
+                    if distance < 60 and not enemy.hurt:
+                        if player.direction == 'left' and enemy.pos.x < player.pos.x:
+                            enemy.hurt = True
+                            enemy.hurt_time = pygame.time.get_ticks()
+                            enemy.hp -= 1
+                    elif distance > 60 and not enemy.hurt:
+                        if player.direction == 'right' and enemy.pos.x > player.pos.x:
+                            enemy.hurt = True
+                            enemy.hurt_time = pygame.time.get_ticks()
+                            enemy.hp -= 1
 
 
     pygame.display.update()
