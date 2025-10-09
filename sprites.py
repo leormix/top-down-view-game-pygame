@@ -5,14 +5,14 @@ import pygame
 # Игрок стоит
 
 humanIdleLeft = [
-    pygame.image.load('sprites/human/human_idle_left/image_part_001.png'),
-    pygame.image.load('sprites/human/human_idle_left/image_part_002.png'),
-    pygame.image.load('sprites/human/human_idle_left/image_part_003.png'),
-    pygame.image.load('sprites/human/human_idle_left/image_part_004.png'),
-    pygame.image.load('sprites/human/human_idle_left/image_part_005.png'),
-    pygame.image.load('sprites/human/human_idle_left/image_part_006.png'),
-    pygame.image.load('sprites/human/human_idle_left/image_part_007.png'),
     pygame.image.load('sprites/human/human_idle_left/image_part_008.png'),
+    pygame.image.load('sprites/human/human_idle_left/image_part_007.png'),
+    pygame.image.load('sprites/human/human_idle_left/image_part_006.png'),
+    pygame.image.load('sprites/human/human_idle_left/image_part_005.png'),
+    pygame.image.load('sprites/human/human_idle_left/image_part_004.png'),
+    pygame.image.load('sprites/human/human_idle_left/image_part_003.png'),
+    pygame.image.load('sprites/human/human_idle_left/image_part_002.png'),
+    pygame.image.load('sprites/human/human_idle_left/image_part_001.png'),
 ]
 
 humanIdleLeft = [pygame.transform.scale_by(frame, 2) for frame in humanIdleLeft]
@@ -33,14 +33,14 @@ humanIdleRight = [pygame.transform.scale_by(frame, 2) for frame in humanIdleRigh
 # игрок идет
 
 humanWalkLeft = [
-    pygame.image.load('sprites/human/human_walk_left/image_part_001.png'),
-    pygame.image.load('sprites/human/human_walk_left/image_part_002.png'),
-    pygame.image.load('sprites/human/human_walk_left/image_part_003.png'),
-    pygame.image.load('sprites/human/human_walk_left/image_part_004.png'),
-    pygame.image.load('sprites/human/human_walk_left/image_part_005.png'),
-    pygame.image.load('sprites/human/human_walk_left/image_part_006.png'),
-    pygame.image.load('sprites/human/human_walk_left/image_part_007.png'),
     pygame.image.load('sprites/human/human_walk_left/image_part_008.png'),
+    pygame.image.load('sprites/human/human_walk_left/image_part_007.png'),
+    pygame.image.load('sprites/human/human_walk_left/image_part_006.png'),
+    pygame.image.load('sprites/human/human_walk_left/image_part_005.png'),
+    pygame.image.load('sprites/human/human_walk_left/image_part_004.png'),
+    pygame.image.load('sprites/human/human_walk_left/image_part_003.png'),
+    pygame.image.load('sprites/human/human_walk_left/image_part_002.png'),
+    pygame.image.load('sprites/human/human_walk_left/image_part_001.png'),
 ]
 
 humanWalkLeft = [pygame.transform.scale_by(frame, 2) for frame in humanWalkLeft]
@@ -118,6 +118,34 @@ humanRunRight = [
 
 humanRunRight = [pygame.transform.scale_by(frame, 2) for frame in humanRunRight]
 
+# Игрок получает пизды
+
+humanHurtLeft = [
+    pygame.image.load('sprites/human/human_hurt_left/image_part_008.png'),
+    pygame.image.load('sprites/human/human_hurt_left/image_part_007.png'),
+    pygame.image.load('sprites/human/human_hurt_left/image_part_006.png'),
+    pygame.image.load('sprites/human/human_hurt_left/image_part_005.png'),
+    pygame.image.load('sprites/human/human_hurt_left/image_part_004.png'),
+    pygame.image.load('sprites/human/human_hurt_left/image_part_003.png'),
+    pygame.image.load('sprites/human/human_hurt_left/image_part_002.png'),
+    pygame.image.load('sprites/human/human_hurt_left/image_part_001.png'),
+]
+
+humanHurtLeft = [pygame.transform.scale_by(frame, 2) for frame in humanHurtLeft]
+
+humanHurtRight = [
+    pygame.image.load('sprites/human/human_hurt_right/image_part_001.png'),
+    pygame.image.load('sprites/human/human_hurt_right/image_part_002.png'),
+    pygame.image.load('sprites/human/human_hurt_right/image_part_003.png'),
+    pygame.image.load('sprites/human/human_hurt_right/image_part_004.png'),
+    pygame.image.load('sprites/human/human_hurt_right/image_part_005.png'),
+    pygame.image.load('sprites/human/human_hurt_right/image_part_006.png'),
+    pygame.image.load('sprites/human/human_hurt_right/image_part_007.png'),
+    pygame.image.load('sprites/human/human_hurt_right/image_part_008.png'),
+]
+
+humanHurtRight = [pygame.transform.scale_by(frame, 2) for frame in humanHurtRight]
+
 # Игрок умирает
 
 humanDeathLeft = [
@@ -161,14 +189,14 @@ humanDeathRight = [pygame.transform.scale_by(frame, 2) for frame in humanDeathRi
 
 
 goblinIdleLeft = [
-    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_001.png'),
-    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_002.png'),
-    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_003.png'),
-    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_004.png'),
-    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_005.png'),
-    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_006.png'),
-    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_007.png'),
     pygame.image.load('sprites/goblin/goblin_idle_left/image_part_008.png'),
+    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_007.png'),
+    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_006.png'),
+    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_005.png'),
+    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_004.png'),
+    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_003.png'),
+    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_002.png'),
+    pygame.image.load('sprites/goblin/goblin_idle_left/image_part_001.png'),
 ]
 goblinIdleLeft = [pygame.transform.scale_by(frame, 2) for frame in goblinIdleLeft]
 
@@ -186,14 +214,14 @@ goblinIdleRight = [pygame.transform.scale_by(frame, 2) for frame in goblinIdleRi
 
 # Враг идет
 goblinWalkLeft = [
-    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_001.png'),
-    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_002.png'),
-    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_003.png'),
-    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_004.png'),
-    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_005.png'),
-    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_006.png'),
-    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_007.png'),
     pygame.image.load('sprites/goblin/goblin_walk_left/image_part_008.png'),
+    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_007.png'),
+    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_006.png'),
+    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_005.png'),
+    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_004.png'),
+    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_003.png'),
+    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_002.png'),
+    pygame.image.load('sprites/goblin/goblin_walk_left/image_part_001.png'),
 ]
 goblinWalkLeft = [pygame.transform.scale_by(frame, 2) for frame in goblinWalkLeft]
 
@@ -208,4 +236,33 @@ goblinWalkRight = [
     pygame.image.load('sprites/goblin/goblin_walk_right/image_part_008.png'),
 ]
 goblinWalkRight = [pygame.transform.scale_by(frame, 2) for frame in goblinWalkRight]
+
+# Враг умрает
+
+goblinDeathLeft = [
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_009.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_008.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_007.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_006.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_005.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_004.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_003.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_002.png'),
+    pygame.image.load('sprites/goblin/goblin_death_left/image_part_001.png'),
+]
+goblinDeathLeft = [pygame.transform.scale_by(frame, 2) for frame in goblinDeathLeft]
+
+goblinDeathRight = [
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_001.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_002.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_003.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_004.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_005.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_006.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_007.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_008.png'),
+    pygame.image.load('sprites/goblin/goblin_death_right/image_part_008.png'),
+]
+goblinDeathRight = [pygame.transform.scale_by(frame, 2) for frame in goblinDeathRight]
+
 

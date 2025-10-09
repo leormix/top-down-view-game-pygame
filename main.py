@@ -10,7 +10,7 @@ pygame.init()
 
 # vars
 
-WINDOW_WIDTH, WINDOW_HEIGHT = 900, 500
+WINDOW_WIDTH, WINDOW_HEIGHT = 900, 600
 screen = pygame.display.set_mode ((WINDOW_WIDTH, WINDOW_HEIGHT))
 FPS = 60
 ANIM_SPEED = 10
@@ -40,6 +40,8 @@ class Player:
         self.hp = 3
         self.dead = False
         self.death_time = None
+        self.hurt = False
+        self.hurt_time = None
 
         
 
@@ -80,41 +82,46 @@ class Player:
 
 
     def update(self):
-        
+        # обработка ввода и базовый инкремент анимации
         self.handle_input()
+        self.anim_count += 2
 
-    # применяем отталкивание
+        # применяем отталкивание (перемещение + затухание)
+
         if self.knockback.length() > 0.1:
             self.pos += self.knockback
             self.knockback *= self.knockback_decay
+            self.is_hurt = True
         else:
             self.knockback = Vector2(0, 0)
-            
-        self.anim_count += 2
-        
-        # print("Losed") if self.hp == 0 else None
 
         # границы
         self.pos.x = max(-55, min(self.pos.x, 800))
         self.pos.y = max(-55, min(self.pos.y, 400))
 
-        # спрайтеке
+        # если мёртв — показываем анимацию смерти и выходим
         if self.dead:
             sprites = humanDeathLeft if self.last_horizontal == "left" else humanDeathRight
             self.anim_count += 1  # счётчик кадров смерти
-
             frame_index = self.anim_count // ANIM_SPEED
-
-            # если ещё не дошли до конца анимации — проигрываем кадры по порядку
             if frame_index < len(sprites):
                 frame = sprites[frame_index]
             else:
-                frame = sprites[-1]  # остаёмся на последнем кадре
-
+                frame = sprites[-1]
             screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
             return
+        if self.hurt:
+            sprites = humanHurtLeft if self.last_horizontal == "left" else humanHurtRight
+            frame_index = self.anim_count // ANIM_SPEED
+            if frame_index < len(sprites):
+                frame = sprites[frame_index]
+                screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
+                self.anim_count += 2
+                return
+            else:
+                self.hurt = False  
 
-
+        # обычная логика: атака / ходьба / стоим
         if self.attacking:
             if self.direction == "left":
                 sprites = humanAttackLeft
@@ -128,14 +135,14 @@ class Player:
                 self.anim_count = 0
 
         elif self.walking:
-            if self.running:  # бег
+            if self.running:
                 if self.direction == "left":
                     sprites = humanRunLeft
                 elif self.direction == "right":
                     sprites = humanRunRight
                 else:
                     sprites = humanRunLeft if self.last_horizontal == "left" else humanRunRight
-            else:  # обычная ходьба
+            else:
                 if self.direction == "left":
                     sprites = humanWalkLeft
                 elif self.direction == "right":
@@ -145,12 +152,11 @@ class Player:
         else:
             sprites = humanIdleLeft if self.last_horizontal == "left" else humanIdleRight
 
-        # отрисовка
-        frame = sprites[(self.anim_count // ANIM_SPEED) % len(sprites)]
-        screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
+        # отрисовка выбранного спрайта
+        if len(sprites) > 0:
+            frame = sprites[(self.anim_count // ANIM_SPEED) % len(sprites)]
+            screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
 
-
-        
 
 player = Player()
 clock = pygame.time.Clock()
@@ -232,7 +238,12 @@ class Enemy:
             if player.knockback.length() == 0:
                 knockback = (player.pos - self.pos).normalize() * 8
                 player.knockback = knockback
+                player.anim_count = 0
+                player.walking = False
                 player.hp -= 1
+                player.hurt = True
+                player.anim_count = 0
+
                 if player.hp <= 0 and not player.dead:
                     player.walking = False
                     player.dead = True
@@ -262,7 +273,7 @@ while running:
 
     # показываем GAME OVER при смерти
     if player.dead:
-        if pygame.time.get_ticks() - player.death_time < 3000:
+        if pygame.time.get_ticks() - player.death_time < 60000:
             lose_text = font.render("GAME OVER", True, (255, 255, 255))
             text_rect = lose_text.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
             screen.blit(lose_text, text_rect)
