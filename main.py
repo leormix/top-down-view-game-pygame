@@ -42,6 +42,7 @@ class Player:
         self.dead = False
         self.death_time = None
         self.hurt = False
+        self.has_hit = False  # ФИКС: Добавим флаг для отслеживания нанесения урона
 
 
     def handle_input(self):
@@ -60,7 +61,9 @@ class Player:
         if keys[pygame.K_SPACE] and not self.attacking:
             self.attacking = True
             self.attack_start_time = pygame.time.get_ticks()
+            self.attack_hit_time = self.attack_start_time + 300
             self.anim_count = 0
+            self.has_hit = False  
 
         if not self.attacking:
             if keys[pygame.K_w]:
@@ -326,20 +329,31 @@ while running:
             screen.blit(frame, (int(enemy.pos.x), int(enemy.pos.y)))
 
 
-    if player.attacking:
-        for enemy in enemies:
-                if not enemy.hurt:
-                    distance = (enemy.pos - player.pos).length()
-                    if distance < 60 and not enemy.hurt:
-                        if player.direction == 'left' and enemy.pos.x < player.pos.x:
-                            enemy.hurt = True
-                            enemy.hurt_time = pygame.time.get_ticks()
-                            enemy.hp -= 1
-                    elif distance > 60 and not enemy.hurt:
-                        if player.direction == 'right' and enemy.pos.x > player.pos.x:
-                            enemy.hurt = True
-                            enemy.hurt_time = pygame.time.get_ticks()
-                            enemy.hp -= 1
+
+    if player.attacking and not player.has_hit and current_time >= player.attack_hit_time:
+        # напрямок атаки
+        attack_direction = player.direction
+        if attack_direction in ["up", "down"]:
+            attack_direction = player.last_horizontal
+            
+
+        for enemy in enemies[:]:  
+            distance = (enemy.pos - player.pos).length()
+            
+            # Проверяем расстояние и направление
+            if distance < 60:
+                if (attack_direction == 'left' and enemy.pos.x < player.pos.x) or \
+                   (attack_direction == 'right' and enemy.pos.x > player.pos.x):
+                    # Наносим урон только 1 раз за атаку
+                    enemy.hurt = True
+                    enemy.hurt_time = pygame.time.get_ticks()
+                    enemy.hp -= 1  
+                    player.has_hit = True  
+                    
+                   
+                    if enemy.hp <= 0:
+                        enemies.remove(enemy)
+                    break  
 
 
     pygame.display.update()
