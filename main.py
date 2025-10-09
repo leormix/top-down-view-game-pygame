@@ -12,7 +12,7 @@ pygame.init()
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 900, 500
 screen = pygame.display.set_mode ((WINDOW_WIDTH, WINDOW_HEIGHT))
-FPS = 60 
+FPS = 60
 ANIM_SPEED = 10
 running = True
 font = pygame.font.SysFont(None, 36)
@@ -41,10 +41,14 @@ class Player:
         self.dead = False
         self.death_time = None
 
+        
+
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
         vec = Vector2(0, 0)
+
+        if self.dead: return
 
         # спринт
         self.running = keys[pygame.K_LSHIFT]
@@ -73,6 +77,8 @@ class Player:
             else:
                 self.walking = False
 
+
+
     def update(self):
         
         self.handle_input()
@@ -93,6 +99,22 @@ class Player:
         self.pos.y = max(-55, min(self.pos.y, 400))
 
         # спрайтеке
+        if self.dead:
+            sprites = humanDeathLeft if self.last_horizontal == "left" else humanDeathRight
+            self.anim_count += 1  # счётчик кадров смерти
+
+            frame_index = self.anim_count // ANIM_SPEED
+
+            # если ещё не дошли до конца анимации — проигрываем кадры по порядку
+            if frame_index < len(sprites):
+                frame = sprites[frame_index]
+            else:
+                frame = sprites[-1]  # остаёмся на последнем кадре
+
+            screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
+            return
+
+
         if self.attacking:
             if self.direction == "left":
                 sprites = humanAttackLeft
@@ -212,8 +234,12 @@ class Enemy:
                 player.knockback = knockback
                 player.hp -= 1
                 if player.hp <= 0 and not player.dead:
+                    player.walking = False
                     player.dead = True
                     player.death_time = pygame.time.get_ticks()
+                    player.anim_count = 0
+
+
                 
 
 enemy = Enemy()

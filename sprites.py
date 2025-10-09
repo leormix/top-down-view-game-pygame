@@ -118,6 +118,44 @@ humanRunRight = [
 
 humanRunRight = [pygame.transform.scale_by(frame, 2) for frame in humanRunRight]
 
+# Игрок умирает
+
+humanDeathLeft = [
+    pygame.image.load('sprites/human/human_death_left/image_part_013.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_012.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_011.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_010.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_009.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_008.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_007.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_006.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_005.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_004.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_003.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_002.png'),
+    pygame.image.load('sprites/human/human_death_left/image_part_001.png'),
+]
+
+humanDeathLeft = [pygame.transform.scale_by(frame, 2) for frame in humanDeathLeft]
+
+humanDeathRight = [
+    pygame.image.load('sprites/human/human_death_right/image_part_001.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_002.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_003.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_004.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_005.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_006.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_007.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_008.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_009.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_010.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_011.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_012.png'),
+    pygame.image.load('sprites/human/human_death_right/image_part_013.png'),
+]
+
+humanDeathRight = [pygame.transform.scale_by(frame, 2) for frame in humanDeathRight]
+
 # Враг
 # Враг стоит
 
