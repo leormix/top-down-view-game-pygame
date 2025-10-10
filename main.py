@@ -173,80 +173,69 @@ class Enemy:
         self.last_horizontal = "left"
         self.speed = speed
         self.tile_size = tile_size
-        self.target_pos = self.pos.copy()  # куда идем
+        self.target_pos = self.pos.copy()
         self.wait_time = 0  
-        self.game_over_time = None
         self.hp = 3
         self.hurt = False
         self.hurt_time = 0
         self.hurt_duration = 300
-        
-        
+        self.dead = False
+        self.death_start_time = None
 
-    def choose_new_action(self):
-        # стоїм або ідем
-        if random.random() < 0.5:
-            # стоїм
-            self.walking = False
-            self.wait_time = random.randint(30, 60)  # 0.5–2 сек
-        else:
-            # ідем
-            self.walking = True
-            dx, dy = random.choice([(2,0),(-2,0),(0,2),(0,-2)])
-            self.target_pos = self.pos + Vector2(dx*self.tile_size, dy*self.tile_size)
-            # направление для анимации
-            if dx < 0: self.direction, self.last_horizontal = "left", "left"
-            if dx > 0: self.direction, self.last_horizontal = "right", "right"
-            if dy < 0: self.direction = "up"
-            if dy > 0: self.direction = "down"
-
-
-        
     def update(self, player):
         self.anim_count += 2
+
+        # --- Если мертв — проигрываем анимацию смерти ---
+        if self.dead:
+            sprites = goblinDeathLeft if self.last_horizontal == "left" else goblinDeathRight
+            frame_index = self.anim_count // ANIM_SPEED
+
+            if frame_index < len(sprites):
+                frame = sprites[frame_index]
+                screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
+            else:
+                # когда анимация закончилась — удалить
+                enemies.remove(self)
+            return
+        # -----------------------------------------------
+
         if self.hurt:
             sprites = goblinHurtLeft if self.last_horizontal == "left" else goblinHurtRight
             frame_index = (self.anim_count // ANIM_SPEED) % len(sprites)
             frame = sprites[frame_index]
             screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
 
-            # проверяем, прошло ли время анимации
             if pygame.time.get_ticks() - self.hurt_time > self.hurt_duration:
                 self.hurt = False
-            return  # не двигаемся, пока "болит"
+            return  
 
-        # направление на игрока
+        # движение к игроку
         direction = player.pos - self.pos
         if direction.length() > 1:
             move = direction.normalize() * self.speed
             self.pos += move
 
-            # направление для анимации
             if abs(direction.x) > abs(direction.y):
                 if direction.x < 0:
                     self.direction, self.last_horizontal = "left", "left"
                 else:
                     self.direction, self.last_horizontal = "right", "right"
             else:
-                if direction.y < 0:
-                    self.direction = "up"
-                else:
-                    self.direction = "down"
+                self.direction = "up" if direction.y < 0 else "down"
 
             walking = True
         else:
             walking = False
 
         # выбор спрайтов
-        if walking:
-            sprites = goblinWalkLeft if self.last_horizontal == "left" else goblinWalkRight
-        else:
-            sprites = goblinIdleLeft if self.last_horizontal == "left" else goblinIdleRight
+        sprites = (
+            goblinWalkLeft if walking and self.last_horizontal == "left"
+            else goblinWalkRight if walking
+            else goblinIdleLeft if self.last_horizontal == "left"
+            else goblinIdleRight
+        )
 
-        frame = sprites[(self.anim_count // ANIM_SPEED) % len(sprites)]
-        screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
-
-        # столкновение с игроком (только если он жив)
+        # столкновение
         if not player.dead:
             player_rect = pygame.Rect(player.pos.x, player.pos.y, 40, 40)
             enemy_rect = pygame.Rect(self.pos.x, self.pos.y, 40, 40)
@@ -258,16 +247,20 @@ class Enemy:
                     player.anim_count = 0
                     player.hurt = True
                     player.walking = False
-
                     if player.hp <= 0 and not player.dead:
                         player.dead = True
                         player.death_time = pygame.time.get_ticks()
                         player.anim_count = 0
 
-        if self.hp <= 0:
-            enemies.remove(self)
+        # смерть (когда hp <= 0)
+        if self.hp <= 0 and not self.dead:
+            self.dead = True
+            self.anim_count = 0
+            self.death_start_time = pygame.time.get_ticks()
             return
 
+        frame = sprites[(self.anim_count // ANIM_SPEED) % len(sprites)]
+        screen.blit(frame, (int(self.pos.x), int(self.pos.y)))
 
 
                 
@@ -297,7 +290,7 @@ ui = UI(player)
 
 enemy = Enemy()
 enemies = []
-next_spawn_time = pygame.time.get_ticks() + random.randint(5000, 10000)
+next_spawn_time = pygame.time.get_ticks() + random.randint(3000, 10000)
 
 while running:
     for event in pygame.event.get():
@@ -308,15 +301,30 @@ while running:
 
    
     player.update()
-    ui.update(screen)
+
 
     if not player.dead:
         current_time = pygame.time.get_ticks()
         if current_time >= next_spawn_time:
-            x = random.randint(0, WINDOW_WIDTH - 40)
-            y = random.randint(0, WINDOW_HEIGHT - 40)
+            # выбираем сторону появления: 0=слева, 1=справа, 2=сверху, 3=снизу
+            side = random.choice(["left", "right", "top", "bottom"])
+            margin = 50  # насколько далеко за картой спавнить
+
+            if side == "left":
+                x = -margin
+                y = random.randint(0, WINDOW_HEIGHT)
+            elif side == "right":
+                x = WINDOW_WIDTH + margin
+                y = random.randint(0, WINDOW_HEIGHT)
+            elif side == "top":
+                x = random.randint(0, WINDOW_WIDTH)
+                y = -margin
+            else:  # bottom
+                x = random.randint(0, WINDOW_WIDTH)
+                y = WINDOW_HEIGHT + margin
+
             enemies.append(Enemy(x, y))
-            next_spawn_time = current_time + random.randint(5000, 10000)
+            next_spawn_time = current_time + random.randint(3000, 10000)
 
         for enemy in enemies:
             enemy.update(player)
@@ -328,6 +336,17 @@ while running:
             frame = sprites[(enemy.anim_count // ANIM_SPEED) % len(sprites)]
             screen.blit(frame, (int(enemy.pos.x), int(enemy.pos.y)))
 
+        keys = pygame.key.get_pressed()
+
+        # Рестарт Player обнуляеться Енеми обновляеться и тд
+
+        if keys[pygame.K_r]:
+            player = Player()
+            ui = UI(player)
+            enemies = []
+            next_spawn_time = pygame.time.get_ticks() + random.randint(3000, 10000)
+
+
 
 
     if player.attacking and not player.has_hit and current_time >= player.attack_hit_time:
@@ -338,7 +357,7 @@ while running:
             
 
         for enemy in enemies[:]:  
-            distance = (enemy.pos - player.pos).length()
+            distance = (enemy.pos - player.pos).length()        
             
             # Проверяем расстояние и направление
             if distance < 60:
@@ -348,13 +367,10 @@ while running:
                     enemy.hurt = True
                     enemy.hurt_time = pygame.time.get_ticks()
                     enemy.hp -= 1  
-                    player.has_hit = True  
-                    
-                   
-                    if enemy.hp <= 0:
-                        enemies.remove(enemy)
-                    break  
+                    player.has_hit = True   
 
+    
+    ui.update(screen)
 
     pygame.display.update()
     clock.tick(FPS)
