@@ -280,7 +280,7 @@ class UI:
 
         if player.dead:
             if self.now - player.death_time < 60000:
-                lose_text = font.render("GAME OVER", True, (255, 255, 255))
+                lose_text = font.render("GAME OVER - Press 'R' for restar", True, (255, 255, 255))
                 text_rect = lose_text.get_rect(center=(WINDOW_WIDTH//2, WINDOW_HEIGHT//2))
                 screen.blit(lose_text, text_rect)
    
@@ -361,8 +361,7 @@ while running:
             
             # Проверяем расстояние и направление
             if distance < 60:
-                if (attack_direction == 'left' and enemy.pos.x < player.pos.x) or \
-                   (attack_direction == 'right' and enemy.pos.x > player.pos.x):
+                if (attack_direction == 'left' and enemy.pos.x < player.pos.x) or (attack_direction == 'right' and enemy.pos.x > player.pos.x):
                     # Наносим урон только 1 раз за атаку
                     enemy.hurt = True
                     enemy.hurt_time = pygame.time.get_ticks()
